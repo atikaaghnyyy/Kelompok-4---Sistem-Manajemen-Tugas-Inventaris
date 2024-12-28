@@ -179,31 +179,33 @@ void getDetailsInventory() {
 
     cout << "\n=== Inventory List ===\n";
     for (int i = 0; i < inventoryCount; i++) {
-        cout << "Item ID: " << i + 1 << ", Item Code: " << inventoryManagement[i][0] << ", Item Name: " << inventoryManagement[i][1] << ", Quantity: " << inventoryManagement[i][2] << ", Category: " << inventoryManagement[i][3]<< ", Status: " << inventoryManagement[i][4]<< endl;
+        cout << "Item ID: " << i + 1 << ", Item Code: " << inventoryManagement[i][0] << ", Item Name: " << inventoryManagement[i][2] << ", Quantity: " << inventoryManagement[i][2] << ", Category: " << inventoryManagement[i][3]<< ", Status: " << inventoryManagement[i][4]<< endl;
     }
 }
 
 // =================== Tracking Peminjaman (Farisyah) ===================
 const int MAX_BORROWS = 100;
 
-struct Inventory {
-    string item_code;
-    string item_name;
-    int quantity;
-    string status;
-    string category;
-};
+// struct Inventory {
+//     string item_code;
+//     string item_name;
+//     int quantity;
+//     string status;
+//     string category;
+// };
 
-struct BorrowRecord {
-    string item_code;
-    string borrower_name;
-    string borrow_date;
-    string expected_return_date;
-};
+// struct BorrowRecord {
+//     string item_code;
+//     string borrower_name;
+//     string borrow_date;
+//     string expected_return_date;
+// };
 
-Inventory inventory[MAX_ITEMS];
+// Inventory inventory[MAX_ITEMS];
 
-BorrowRecord borrowRecords[MAX_BORROWS];
+// BorrowRecord borrowRecords[MAX_BORROWS];
+string borrowRecords[MAX_BORROWS][4];
+
 int borrowRecordCount = 0;
 
 // Function to borrow a tool
@@ -221,12 +223,12 @@ void borrowTool() {
 
     bool found = false;
     for (int i = 0; i < inventoryCount; i++) {
-        if (inventory[i].item_code == item_code) {
+        if (inventoryManagement[i][2] == item_code) {
             found = true;
-            if (inventory[i].quantity > 0) {
+            if (stoi(inventoryManagement[i][2]) > 0) {
                 cout << "Enter quantity to borrow: ";
                 cin >> quantity;
-                if (quantity > inventory[i].quantity) {
+                if (quantity > stoi(inventoryManagement[i][2])) {
                     cout << "Not enough tools available." << endl;
                 } else {
                     cout << "Enter borrower name: ";
@@ -243,14 +245,18 @@ void borrowTool() {
                     mktime(ltm);
                     expected_return_date = to_string(ltm->tm_mday) + "/" + to_string(1 + ltm->tm_mon) + "/" + to_string(1900 + ltm->tm_year);
 
-                    borrowRecords[borrowRecordCount].item_code = item_code;
-                    borrowRecords[borrowRecordCount].borrower_name = borrower_name;
-                    borrowRecords[borrowRecordCount].borrow_date = borrow_date;
-                    borrowRecords[borrowRecordCount].expected_return_date = expected_return_date;
+                    inventoryManagement[borrowRecordCount][0] = item_code;
+                    inventoryManagement[borrowRecordCount][1] = borrower_name;
+                    inventoryManagement[borrowRecordCount][2] = borrow_date;
+                    inventoryManagement[borrowRecordCount][3] = expected_return_date;
+                    inventoryManagement[borrowRecordCount][4] = to_string(quantity);
                     borrowRecordCount++;
 
-                    inventory[i].quantity -= quantity;
-                    inventory[i].status = "borrowed";
+                    int currentQuantity = stoi(inventoryManagement[i][2]);
+                    currentQuantity -= quantity;
+                    inventoryManagement[i][2] = to_string(currentQuantity);
+
+                    inventoryManagement[i][4] = "borrowed";
                     cout << "Tool borrowed successfully!" << endl;
                     cout << "Borrow Date: " << borrow_date << endl;
                     cout << "Expected Return Date: " << expected_return_date << endl;
@@ -277,20 +283,25 @@ void returnTool() {
 
     bool found = false;
     for (int i = 0; i < inventoryCount; i++) {
-        if (inventory[i].item_code == item_code) {
+        if (inventoryManagement[i][0] == item_code) { // Assuming [0] is the item code
             found = true;
             cout << "Enter quantity to return: ";
             cin >> quantity;
 
-            inventory[i].quantity += quantity;
-            inventory[i].status = "available";
+            int currentQuantity = stoi(inventoryManagement[i][2]); // Assuming [2] is the quantity
+            currentQuantity += quantity;
+            inventoryManagement[i][2] = to_string(currentQuantity);
+            inventoryManagement[i][4] = "available"; // Assuming [4] is the status
 
-            // Remove borrow record (optional, can be archived instead)
+            // Remove borrow record
             for (int j = 0; j < borrowRecordCount; j++) {
-                if (borrowRecords[j].item_code == item_code) {
+                if (borrowRecords[j][0] == item_code) { // Assuming [0] is the item code in borrowRecords
                     // Shift records to remove the borrowed one
                     for (int k = j; k < borrowRecordCount - 1; k++) {
-                        borrowRecords[k] = borrowRecords[k + 1];
+                        borrowRecords[k][0] = borrowRecords[k + 1][0];
+                        borrowRecords[k][1] = borrowRecords[k + 1][1];
+                        borrowRecords[k][2] = borrowRecords[k + 1][2];
+                        borrowRecords[k][3] = borrowRecords[k + 1][3];
                     }
                     borrowRecordCount--;
                     break;
@@ -317,8 +328,8 @@ void displayBorrowRecords() {
     cout << "Borrow Records:" << endl;
     cout << "Item Code\tBorrower\tBorrow Date\tExpected Return Date" << endl;
     for (int i = 0; i < borrowRecordCount; i++) {
-        cout << borrowRecords[i].item_code << "\t" << borrowRecords[i].borrower_name << "\t"
-             << borrowRecords[i].borrow_date << "\t" << borrowRecords[i].expected_return_date << endl;
+        cout << borrowRecords[i][0] << "\t" << borrowRecords[i][1] << "\t"
+             << borrowRecords[i][2]<< "\t" << borrowRecords[i][3] << endl;
     }
 }
 // =================== Tracking Peminjaman (Farisyah) ===================
