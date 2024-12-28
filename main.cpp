@@ -328,11 +328,9 @@ void inventoryManagementMenu() {
     do {
         cout << "\n=== Inventory Management ===\n";
         cout << "1. Add a new inventory\n";
-        cout << "2. View inventory list\n";
-        cout << "3. Borrow Tools\n";
-        cout << "4. Return Tools\n";
-        cout << "5. Display Borrow Records\n";
-        cout << "6. Back\n";
+        cout << "2. View inventory list\n";        
+        cout << "3. Display Borrow Records\n";
+        cout << "4. Back\n";
         cout << "Enter your choice: ";
         cin >> choice;
 
@@ -344,21 +342,15 @@ void inventoryManagementMenu() {
                 getDetailsInventory();
                 break;
             case 3:
-                borrowTool();
-                break;
-            case 4:
-                returnTool();
-                break;
-            case 5:
                 displayBorrowRecords();
                 break;
-            case 6:
+            case 4:
                 cout << "Returning to previous menu...\n";
                 break;
             default:
                 cout << "Invalid choice. Please try again.\n";
         }
-    } while (choice != 6);
+    } while (choice != 4);
 }
 
 // =================== Main Menu ===================
@@ -393,7 +385,9 @@ void technicianMenu() {
     do {
         cout << "\n=== Technician Menu ===\n";
         cout << "1. View Task List\n";
-        cout << "2. Exit\n";
+        cout << "2. Borrow Tools\n";
+        cout << "3. Return Tools\n";
+        cout << "4. Exit\n";
         cout << "Enter your choice: ";
         cin >> choice;
 
@@ -402,12 +396,18 @@ void technicianMenu() {
                 getDetailsTask();
                 break;
             case 2:
+                borrowTool();
+                break;
+            case 3:
+                returnTool();
+                break;
+            case 4:
                 cout << "Exiting Technician Menu...\n";
                 break;
             default:
                 cout << "Invalid choice. Please try again.\n";
         }
-    } while (choice != 2);
+    } while (choice != 4);
 }
 
 // =================== Main Program ===================
