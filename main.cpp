@@ -183,13 +183,156 @@ void getDetailsInventory() {
     }
 }
 
+// =================== Tracking Peminjaman (Farisyah) ===================
+const int MAX_BORROWS = 100;
+
+struct Inventory {
+    string item_code;
+    string item_name;
+    int quantity;
+    string status;
+    string category;
+};
+
+struct BorrowRecord {
+    string item_code;
+    string borrower_name;
+    string borrow_date;
+    string expected_return_date;
+};
+
+Inventory inventory[MAX_ITEMS];
+
+BorrowRecord borrowRecords[MAX_BORROWS];
+int borrowRecordCount = 0;
+
+// Function to borrow a tool
+void borrowTool() {
+    if (borrowRecordCount >= MAX_BORROWS) {
+        cout << "Borrow record limit reached!" << endl;
+        return;
+    }
+
+    string item_code, borrower_name, borrow_date, expected_return_date;
+    int quantity;
+
+    cout << "Enter item code to borrow: ";
+    cin >> item_code;
+
+    bool found = false;
+    for (int i = 0; i < inventoryCount; i++) {
+        if (inventory[i].item_code == item_code) {
+            found = true;
+            if (inventory[i].quantity > 0) {
+                cout << "Enter quantity to borrow: ";
+                cin >> quantity;
+                if (quantity > inventory[i].quantity) {
+                    cout << "Not enough tools available." << endl;
+                } else {
+                    cout << "Enter borrower name: ";
+                    cin.ignore();
+                    getline(cin, borrower_name);
+
+                    // Get current date for borrow date
+                    time_t now = time(0);
+                    tm* ltm = localtime(&now);
+                    borrow_date = to_string(ltm->tm_mday) + "/" + to_string(1 + ltm->tm_mon) + "/" + to_string(1900 + ltm->tm_year);
+
+                    // Calculate expected return date (example: 7 days)
+                    ltm->tm_mday += 7; // Adjust as needed
+                    mktime(ltm);
+                    expected_return_date = to_string(ltm->tm_mday) + "/" + to_string(1 + ltm->tm_mon) + "/" + to_string(1900 + ltm->tm_year);
+
+                    borrowRecords[borrowRecordCount].item_code = item_code;
+                    borrowRecords[borrowRecordCount].borrower_name = borrower_name;
+                    borrowRecords[borrowRecordCount].borrow_date = borrow_date;
+                    borrowRecords[borrowRecordCount].expected_return_date = expected_return_date;
+                    borrowRecordCount++;
+
+                    inventory[i].quantity -= quantity;
+                    inventory[i].status = "borrowed";
+                    cout << "Tool borrowed successfully!" << endl;
+                    cout << "Borrow Date: " << borrow_date << endl;
+                    cout << "Expected Return Date: " << expected_return_date << endl;
+                }
+            } else {
+                cout << "Tool is not available." << endl;
+            }
+            break;
+        }
+    }
+
+    if (!found) {
+        cout << "Tool not found!" << endl;
+    }
+}
+
+// Function to return a tool
+void returnTool() {
+    string item_code;
+    int quantity;
+
+    cout << "Enter tool code to return: ";
+    cin >> item_code;
+
+    bool found = false;
+    for (int i = 0; i < inventoryCount; i++) {
+        if (inventory[i].item_code == item_code) {
+            found = true;
+            cout << "Enter quantity to return: ";
+            cin >> quantity;
+
+            inventory[i].quantity += quantity;
+            inventory[i].status = "available";
+
+            // Remove borrow record (optional, can be archived instead)
+            for (int j = 0; j < borrowRecordCount; j++) {
+                if (borrowRecords[j].item_code == item_code) {
+                    // Shift records to remove the borrowed one
+                    for (int k = j; k < borrowRecordCount - 1; k++) {
+                        borrowRecords[k] = borrowRecords[k + 1];
+                    }
+                    borrowRecordCount--;
+                    break;
+                }
+            }
+
+            cout << "Tool returned successfully!" << endl;
+            break;
+        }
+    }
+
+    if (!found) {
+        cout << "Tool not found!" << endl;
+    }
+}
+
+// Function to display borrow records (optional)
+void displayBorrowRecords() {
+    if (borrowRecordCount == 0) {
+        cout << "No borrow records found." << endl;
+        return;
+    }
+
+    cout << "Borrow Records:" << endl;
+    cout << "Item Code\tBorrower\tBorrow Date\tExpected Return Date" << endl;
+    for (int i = 0; i < borrowRecordCount; i++) {
+        cout << borrowRecords[i].item_code << "\t" << borrowRecords[i].borrower_name << "\t"
+             << borrowRecords[i].borrow_date << "\t" << borrowRecords[i].expected_return_date << endl;
+    }
+}
+// =================== Tracking Peminjaman (Farisyah) ===================
+
 void inventoryManagementMenu() {
     int choice;
     do {
         cout << "\n=== Inventory Management ===\n";
         cout << "1. Add a new inventory\n";
         cout << "2. View inventory list\n";
-        cout << "3. Back\n";
+        cout << "3. Borrow Tools\n";
+        cout << "4. Return Tools\n";
+        cout << "5. Display Borrow Records\n";
+        cout << "6. Back\n";
         cout << "Enter your choice: ";
         cin >> choice;
 
@@ -201,12 +344,21 @@ void inventoryManagementMenu() {
                 getDetailsInventory();
                 break;
             case 3:
+                borrowTool();
+                break;
+            case 4:
+                returnTool();
+                break;
+            case 5:
+                displayBorrowRecords();
+                break;
+            case 6:
                 cout << "Returning to previous menu...\n";
                 break;
             default:
                 cout << "Invalid choice. Please try again.\n";
         }
-    } while (choice != 3);
+    } while (choice != 6);
 }
 
 // =================== Main Menu ===================
@@ -258,6 +410,7 @@ void technicianMenu() {
     } while (choice != 2);
 }
 
+// =================== Main Program ===================
 int main() {
     int choice;
     do {
