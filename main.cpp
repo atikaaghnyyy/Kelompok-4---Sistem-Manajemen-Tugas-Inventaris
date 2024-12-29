@@ -1,6 +1,8 @@
 #include <iostream>
 #include <string>
 #include <algorithm>
+#include <ctime>
+#include <cstdlib> 
 
 using namespace std;
 
@@ -12,11 +14,19 @@ void clearScreen() {
     #endif
 }
 
-// =================== Task Management ===================
 const int MAX_TASKS = 100;
 string taskManagement[MAX_TASKS][6];
 int taskCount = 0;
 
+const int MAX_BORROWS = 100;
+string borrowRecords[MAX_BORROWS][7];
+int borrowRecordCount = 0;
+
+const int MAX_ITEMS = 100;
+string inventoryManagement[MAX_ITEMS][5];
+int inventoryCount = 0;
+
+// =================== Task Management ===================
 bool isNumeric(string str) {
     for (char ch : str) {
         if (ch < '0' || ch > '9') {
@@ -116,6 +126,7 @@ void getDetailsTask() {
 }
 
 void taskManagementMenu() {
+    clearScreen();
     int choice;
     do {
         cout << "\n=== Task Management ===\n";
@@ -142,10 +153,6 @@ void taskManagementMenu() {
 }
 
 // =================== Inventory Management ===================
-const int MAX_ITEMS = 100;
-string inventoryManagement[MAX_ITEMS][5];
-int inventoryCount = 0;
-
 void addNewInventory() {
     if (inventoryCount >= MAX_ITEMS) {
         cout << "ERROR: Inventory list is full!" << endl;
@@ -153,17 +160,38 @@ void addNewInventory() {
     }
 
     cin.ignore();
-    cout << "Enter item code: ";
-    getline(cin, inventoryManagement[inventoryCount][0]);
+    do {
+        cout << "Enter item code: ";
+        getline(cin, inventoryManagement[inventoryCount][0]);
+        if (inventoryManagement[inventoryCount][0].empty()) {
+            cout << "Item code cannot be empty. Please try again." << endl;
+        }
+    } while (inventoryManagement[inventoryCount][0].empty());
 
-    cout << "Enter item name: ";
-    getline(cin, inventoryManagement[inventoryCount][1]);
 
-    cout << "Enter quantity: ";
-    getline(cin, inventoryManagement[inventoryCount][2]);
+    do {
+        cout << "Enter item name: ";
+        getline(cin, inventoryManagement[inventoryCount][1]);
+        if (inventoryManagement[inventoryCount][1].empty()) {
+            cout << "Item name cannot be empty. Please try again." << endl;
+        }
+    } while (inventoryManagement[inventoryCount][1].empty());
 
-    cout << "Enter category: ";
-    getline(cin, inventoryManagement[inventoryCount][3]);
+    do {
+        cout << "Enter quantity: ";
+        getline(cin, inventoryManagement[inventoryCount][2]);
+        if (inventoryManagement[inventoryCount][2].empty()) {
+            cout << "Quantity cannot be empty. Please try again." << endl;
+        }
+    } while (inventoryManagement[inventoryCount][2].empty());
+
+    do {
+        cout << "Enter category (tools/supplies): ";
+        getline(cin, inventoryManagement[inventoryCount][3]);
+        if (inventoryManagement[inventoryCount][3].empty()) {
+            cout << "Category cannot be empty. Please try again." << endl;
+        }
+    } while (inventoryManagement[inventoryCount][3].empty());
 
     inventoryManagement[inventoryCount][4] = "Available";
 
@@ -179,168 +207,60 @@ void getDetailsInventory() {
 
     cout << "\n=== Inventory List ===\n";
     for (int i = 0; i < inventoryCount; i++) {
-        cout << "Item ID: " << i + 1 << ", Item Code: " << inventoryManagement[i][0] << ", Item Name: " << inventoryManagement[i][2] << ", Quantity: " << inventoryManagement[i][2] << ", Category: " << inventoryManagement[i][3]<< ", Status: " << inventoryManagement[i][4]<< endl;
+        cout << "Item ID: " << i + 1 << ", Item Code: " << inventoryManagement[i][0] << ", Item Name: " << inventoryManagement[i][1] << ", Quantity: " << inventoryManagement[i][2] << ", Category: " << inventoryManagement[i][3]<< ", Status: " << inventoryManagement[i][4]<< endl;
     }
 }
 
-// =================== Tracking Peminjaman (Farisyah) ===================
-const int MAX_BORROWS = 100;
-
-// struct Inventory {
-//     string item_code;
-//     string item_name;
-//     int quantity;
-//     string status;
-//     string category;
-// };
-
-// struct BorrowRecord {
-//     string item_code;
-//     string borrower_name;
-//     string borrow_date;
-//     string expected_return_date;
-// };
-
-// Inventory inventory[MAX_ITEMS];
-
-// BorrowRecord borrowRecords[MAX_BORROWS];
-string borrowRecords[MAX_BORROWS][4];
-
-int borrowRecordCount = 0;
-
-// Function to borrow a tool
-void borrowTool() {
-    if (borrowRecordCount >= MAX_BORROWS) {
-        cout << "Borrow record limit reached!" << endl;
+void getDetailsTools() {
+    if (inventoryCount == 0) {
+        cout << "WARN: Inventory list is empty.\n";
         return;
     }
 
-    string item_code, borrower_name, borrow_date, expected_return_date;
-    int quantity;
-
-    cout << "Enter item code to borrow: ";
-    cin >> item_code;
-
-    bool found = false;
+    cout << "\n=== Inventory List ===\n";
     for (int i = 0; i < inventoryCount; i++) {
-        if (inventoryManagement[i][2] == item_code) {
-            found = true;
-            if (stoi(inventoryManagement[i][2]) > 0) {
-                cout << "Enter quantity to borrow: ";
-                cin >> quantity;
-                if (quantity > stoi(inventoryManagement[i][2])) {
-                    cout << "Not enough tools available." << endl;
-                } else {
-                    cout << "Enter borrower name: ";
-                    cin.ignore();
-                    getline(cin, borrower_name);
-
-                    // Get current date for borrow date
-                    time_t now = time(0);
-                    tm* ltm = localtime(&now);
-                    borrow_date = to_string(ltm->tm_mday) + "/" + to_string(1 + ltm->tm_mon) + "/" + to_string(1900 + ltm->tm_year);
-
-                    // Calculate expected return date (example: 7 days)
-                    ltm->tm_mday += 7; // Adjust as needed
-                    mktime(ltm);
-                    expected_return_date = to_string(ltm->tm_mday) + "/" + to_string(1 + ltm->tm_mon) + "/" + to_string(1900 + ltm->tm_year);
-
-                    inventoryManagement[borrowRecordCount][0] = item_code;
-                    inventoryManagement[borrowRecordCount][1] = borrower_name;
-                    inventoryManagement[borrowRecordCount][2] = borrow_date;
-                    inventoryManagement[borrowRecordCount][3] = expected_return_date;
-                    inventoryManagement[borrowRecordCount][4] = to_string(quantity);
-                    borrowRecordCount++;
-
-                    int currentQuantity = stoi(inventoryManagement[i][2]);
-                    currentQuantity -= quantity;
-                    inventoryManagement[i][2] = to_string(currentQuantity);
-
-                    inventoryManagement[i][4] = "borrowed";
-                    cout << "Tool borrowed successfully!" << endl;
-                    cout << "Borrow Date: " << borrow_date << endl;
-                    cout << "Expected Return Date: " << expected_return_date << endl;
-                }
-            } else {
-                cout << "Tool is not available." << endl;
-            }
-            break;
+        if (inventoryManagement[i][3] == "tools") {
+           cout << "Item ID: " << i + 1 << ", Item Code: " << inventoryManagement[i][0] << ", Item Name: " << inventoryManagement[i][1] << ", Quantity: " << inventoryManagement[i][2] << ", Category: " << inventoryManagement[i][3] << ", Status: " << inventoryManagement[i][4]<< endl;
         }
-    }
-
-    if (!found) {
-        cout << "Tool not found!" << endl;
-    }
+     }
 }
 
-// Function to return a tool
-void returnTool() {
-    string item_code;
-    int quantity;
-
-    cout << "Enter tool code to return: ";
-    cin >> item_code;
-
-    bool found = false;
-    for (int i = 0; i < inventoryCount; i++) {
-        if (inventoryManagement[i][0] == item_code) { // Assuming [0] is the item code
-            found = true;
-            cout << "Enter quantity to return: ";
-            cin >> quantity;
-
-            int currentQuantity = stoi(inventoryManagement[i][2]); // Assuming [2] is the quantity
-            currentQuantity += quantity;
-            inventoryManagement[i][2] = to_string(currentQuantity);
-            inventoryManagement[i][4] = "available"; // Assuming [4] is the status
-
-            // Remove borrow record
-            for (int j = 0; j < borrowRecordCount; j++) {
-                if (borrowRecords[j][0] == item_code) { // Assuming [0] is the item code in borrowRecords
-                    // Shift records to remove the borrowed one
-                    for (int k = j; k < borrowRecordCount - 1; k++) {
-                        borrowRecords[k][0] = borrowRecords[k + 1][0];
-                        borrowRecords[k][1] = borrowRecords[k + 1][1];
-                        borrowRecords[k][2] = borrowRecords[k + 1][2];
-                        borrowRecords[k][3] = borrowRecords[k + 1][3];
-                    }
-                    borrowRecordCount--;
-                    break;
-                }
-            }
-
-            cout << "Tool returned successfully!" << endl;
-            break;
-        }
-    }
-
-    if (!found) {
-        cout << "Tool not found!" << endl;
-    }
-}
-
-// Function to display borrow records (optional)
 void displayBorrowRecords() {
     if (borrowRecordCount == 0) {
-        cout << "No borrow records found." << endl;
+        cout << "WARN: borrowRecord is empty.\n";
         return;
     }
 
-    cout << "Borrow Records:" << endl;
-    cout << "Item Code\tBorrower\tBorrow Date\tExpected Return Date" << endl;
+    cout << "\n=== BorrowRecord ===\n";
     for (int i = 0; i < borrowRecordCount; i++) {
-        cout << borrowRecords[i][0] << "\t" << borrowRecords[i][1] << "\t"
-             << borrowRecords[i][2]<< "\t" << borrowRecords[i][3] << endl;
-    }
+        if (borrowRecords[i][6] == "borrowed") {
+            string Created_at = borrowRecords[i][5];
+            int duration = stoi(borrowRecords[i][4]);
+
+            tm tm = {};
+            sscanf(Created_at.c_str(), "%d-%d-%d", &tm.tm_year, &tm.tm_mon, &tm.tm_mday);
+            tm.tm_year -= 1900;
+            tm.tm_mon -= 1;
+
+            time_t startTime = mktime(&tm);
+            time_t estimatedReturnTime = startTime + (duration * 24 * 60 * 60);
+
+            tm = *localtime(&estimatedReturnTime);
+            string estimatedReturnDate = to_string(1900 + tm.tm_year) + "-" + (tm.tm_mon + 1 < 10 ? "0" : "") + to_string(tm.tm_mon + 1) + "-" + (tm.tm_mday < 10 ? "0" : "") + to_string(tm.tm_mday);
+ 
+            cout << "Item ID: " << i + 1 << ", Item Code: " << borrowRecords[i][0] << ", Item Name: " << borrowRecords[i][1] << ", Quantity: " << borrowRecords[i][2] << ", Borrower: " << borrowRecords[i][3] << ", Duration: " << borrowRecords[i][4] << ", Created_at: " << borrowRecords[i][5] << ", Estimated Return Date: " << estimatedReturnDate << ", Status: " << borrowRecords[i][6] << endl;
+        }
+     }
 }
-// =================== Tracking Peminjaman (Farisyah) ===================
 
 void inventoryManagementMenu() {
+    clearScreen();
     int choice;
     do {
         cout << "\n=== Inventory Management ===\n";
         cout << "1. Add a new inventory\n";
         cout << "2. View inventory list\n";        
-        cout << "3. Display Borrow Records\n";
+        cout << "3. View Borrow Records\n";
         cout << "4. Back\n";
         cout << "Enter your choice: ";
         cin >> choice;
@@ -364,10 +284,239 @@ void inventoryManagementMenu() {
     } while (choice != 4);
 }
 
+// =================== Tools Usage ===================
+void borrowTool() {
+    if (borrowRecordCount >= MAX_BORROWS) {
+        cout << "ERROR: Borrow record limit is full!" << endl;
+        return;
+    }
+
+    getDetailsTools();
+
+    cin.ignore();
+    do {
+        cout << "Enter item code to borrow: ";
+        getline(cin, borrowRecords[borrowRecordCount][0]);
+        if (borrowRecords[borrowRecordCount][0].empty()) {
+            cout << "Item code cannot be empty. Please try again." << endl;
+        }
+    } while (borrowRecords[borrowRecordCount][0].empty());
+
+    bool found = false;
+    for (int i = 0; i < inventoryCount; i++) {
+        if (inventoryManagement[i][0] == borrowRecords[borrowRecordCount][0]) {
+            found = true;
+            
+            borrowRecords[borrowRecordCount][1] = inventoryManagement[i][1];
+
+            do {
+                cout << "Enter quantity to borrow: ";
+                getline(cin, borrowRecords[borrowRecordCount][2]);
+                if (borrowRecords[borrowRecordCount][2].empty() || !isNumeric(borrowRecords[borrowRecordCount][2])) {
+                    cout << "Quantity must be a valid number. Please try again." << endl;
+                } else if (stoi(inventoryManagement[i][2]) < stoi(borrowRecords[borrowRecordCount][2])) {
+                    cout << "Insufficient stock. Current stock: " << inventoryManagement[i][2] << endl;
+                } else {
+                    inventoryManagement[i][2] = to_string(stoi(inventoryManagement[i][2]) - stoi(borrowRecords[borrowRecordCount][2]));
+                    if (stoi(inventoryManagement[i][2]) == 0) {
+                        inventoryManagement[i][4] = "InUse";
+                    }
+                    break;
+                }
+            } while (true);
+
+            do {
+                cout << "Enter borrower name: ";
+                getline(cin, borrowRecords[borrowRecordCount][3]);
+                if (borrowRecords[borrowRecordCount][3].empty()) {
+                    cout << "Borrower name cannot be empty. Please try again." << endl;
+                }
+            } while (borrowRecords[borrowRecordCount][3].empty());
+
+            do {
+                cout << "Enter duration in days (1/2): ";
+                getline(cin, borrowRecords[borrowRecordCount][4]);
+                if (borrowRecords[borrowRecordCount][4].empty() || !isNumeric(borrowRecords[borrowRecordCount][4])) {
+                    cout << "Duration must be a valid number greater than 0. Please try again." << endl;
+                }
+            } while (borrowRecords[borrowRecordCount][4].empty());
+
+            time_t now = time(0);
+            tm *localTime = localtime(&now);
+            string currentDate = to_string(1900 + localTime->tm_year) + "-" + (localTime->tm_mon + 1 < 10 ? "0" : "") + to_string(localTime->tm_mon + 1) + "-" + (localTime->tm_mday < 10 ? "0" : "") + to_string(localTime->tm_mday);
+
+            borrowRecords[borrowRecordCount][5] = currentDate;
+            borrowRecords[borrowRecordCount][6] = "borrowed";
+
+            cout << "Tool borrowed successfully!" << endl;
+            borrowRecordCount++;
+            break;
+        }
+    }
+
+    if (!found) {
+        cout << "Tool not found!" << endl;
+    }
+}
+
+void returnTool() {
+    string Item_code;
+
+    displayBorrowRecords();
+    
+    cin.ignore();
+    do {
+        cout << "Enter Item code to return: ";
+        getline(cin, Item_code);
+        if (Item_code.empty()) {
+            cout << "Item code cannot be empty. Please try again." << endl;
+        }
+    } while (Item_code.empty());
+
+    bool found = false;
+    for (int i = 0; i < borrowRecordCount; i++) {
+        if (borrowRecords[i][0] == Item_code) {
+            found = true;
+            if (borrowRecords[i][6] == "borrowed") {
+                borrowRecords[i][6] = "returned";
+            }
+
+            if (inventoryManagement[i][4] == "InUse") {
+                inventoryManagement[i][4] = "Available";
+            }
+            
+            inventoryManagement[i][2] = to_string(stoi(inventoryManagement[i][2]) + stoi(borrowRecords[i][2]));
+
+            cout << "Tool returned successfully!" << endl;
+            break;
+        }
+    }
+
+    if (!found) {
+        cout << "Tool not found!" << endl;
+    }
+}
+
+void toolsUsageMenu() {
+    clearScreen();
+    int choice;
+    do {
+        cout << "\n=== Tools Usage ===\n";
+        cout << "1. Borrow Tools\n";
+        cout << "2. Return Tools\n";
+        cout << "3. Back\n";
+        cout << "Enter your choice: ";
+        cin >> choice;
+
+        switch (choice) {
+            case 1:
+                borrowTool();
+                break;
+            case 2:
+                returnTool();
+                break;
+            case 3:
+                cout << "Returning to previous menu...\n";
+                break;
+            default:
+                cout << "Invalid choice. Please try again.\n";
+        }
+    } while (choice != 3);
+}
+
+// =================== Task Operation ===================
+void viewTasksByTechnician() {
+    string technicianName;
+    cin.ignore();
+    do {
+        cout << "Enter technician name to view assigned tasks: ";
+        getline(cin, technicianName);
+        if (technicianName.empty()) {
+            cout << "Technician name cannot be empty. Please try again." << endl;
+        }
+    } while (technicianName.empty());    
+
+    bool found = false;
+    cout << "\n=== Tasks Assigned to " << technicianName << " ===\n";
+    for (int i = 0; i < taskCount; i++) {
+        if (taskManagement[i][5] == technicianName) {
+            found = true;
+            cout << "Task ID: " << i + 1 << ", Title: " << taskManagement[i][0] << ", Description: " << taskManagement[i][1] << ", Deadline: " << taskManagement[i][2] << ", Priority: " << taskManagement[i][3] << ", Status: " << taskManagement[i][4] << endl;
+        }
+    }
+
+    if (!found) {
+        cout << "No tasks found for technician " << technicianName << endl;
+    }
+}
+
+void updateTaskStatus() {
+    string taskIdStr, newStatus;
+    int taskId;
+
+    viewTasksByTechnician();
+
+    cin.ignore();
+    do {
+        cout << "Enter task ID to update status: ";
+        cin >> taskIdStr;
+        if (taskIdStr.empty() || !isNumeric(taskIdStr)){
+            cout << "Invalid task ID, Please try again." << endl;
+            continue;
+        }
+        taskId = stoi(taskIdStr);
+        if (taskId < 1 || taskId > taskCount) {
+            cout << "Task ID out of range!" << endl;
+            continue;
+        }
+        break;
+    } while (true);
+
+    cin.ignore();
+    do {
+        cout << "Enter new status (InProgress/Done): ";
+        getline(cin, newStatus);
+        if (newStatus != "InProgress" && newStatus != "Done") {
+            cout << "Invalid status. Please enter 'InProgress' or 'Done'." << endl;
+        }
+    } while (newStatus != "InProgress" && newStatus != "Done");
+    
+    taskManagement[taskId - 1][4] = newStatus;
+    cout << "Task status updated to " << newStatus << endl;
+}
+
+void taskOperationMenu() {
+    clearScreen();
+    int choice;
+    do {
+        cout << "\n=== Task Operation ===\n";
+        cout << "1. View Taks\n";
+        cout << "2. Update Task Status \n";
+        cout << "3. Back\n";
+        cout << "Enter your choice: ";
+        cin >> choice;
+
+        switch (choice) {
+            case 1:
+                viewTasksByTechnician();
+                break;
+            case 2:
+                updateTaskStatus();
+                break;
+            case 3:
+                cout << "Returning to previous menu...\n";
+                break;
+            default:
+                cout << "Invalid choice. Please try again.\n";
+        }
+    } while (choice != 3);
+}
+
 // =================== Main Menu ===================
 void adminMenu() {
     int choice;
     do {
+        clearScreen();
         cout << "\n=== Admin Menu ===\n";
         cout << "1. Task Management\n";
         cout << "2. Inventory Management\n";
@@ -394,37 +543,35 @@ void adminMenu() {
 void technicianMenu() {
     int choice;
     do {
+        clearScreen();
         cout << "\n=== Technician Menu ===\n";
-        cout << "1. View Task List\n";
-        cout << "2. Borrow Tools\n";
-        cout << "3. Return Tools\n";
+        cout << "1. Task Operation\n";
+        cout << "2. Tools Usage\n";
         cout << "4. Exit\n";
         cout << "Enter your choice: ";
         cin >> choice;
 
         switch (choice) {
             case 1:
-                getDetailsTask();
+                taskOperationMenu();
                 break;
             case 2:
-                borrowTool();
+                toolsUsageMenu();
                 break;
             case 3:
-                returnTool();
-                break;
-            case 4:
                 cout << "Exiting Technician Menu...\n";
                 break;
             default:
                 cout << "Invalid choice. Please try again.\n";
         }
-    } while (choice != 4);
+    } while (choice != 3);
 }
 
 // =================== Main Program ===================
 int main() {
     int choice;
     do {
+        clearScreen();
         cout << "\n=== Task and Inventory Management System ===\n";
         cout << "1. Login as Admin\n";
         cout << "2. Login as Technician\n";
