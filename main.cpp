@@ -233,7 +233,7 @@ void displayBorrowRecords() {
 
     cout << "\n=== BorrowRecord ===\n";
     for (int i = 0; i < borrowRecordCount; i++) {
-        if (borrowRecords[i][6] == "borrowed") {
+        // if (borrowRecords[i][6] == "borrowed") {
             string Created_at = borrowRecords[i][5];
             int duration = stoi(borrowRecords[i][4]);
 
@@ -249,7 +249,7 @@ void displayBorrowRecords() {
             string estimatedReturnDate = to_string(1900 + tm.tm_year) + "-" + (tm.tm_mon + 1 < 10 ? "0" : "") + to_string(tm.tm_mon + 1) + "-" + (tm.tm_mday < 10 ? "0" : "") + to_string(tm.tm_mday);
  
             cout << "Item ID: " << i + 1 << ", Item Code: " << borrowRecords[i][0] << ", Item Name: " << borrowRecords[i][1] << ", Quantity: " << borrowRecords[i][2] << ", Borrower: " << borrowRecords[i][3] << ", Duration: " << borrowRecords[i][4] << ", Created_at: " << borrowRecords[i][5] << ", Estimated Return Date: " << estimatedReturnDate << ", Status: " << borrowRecords[i][6] << endl;
-        }
+        // }
      }
 }
 
@@ -360,33 +360,44 @@ void borrowTool() {
 }
 
 void returnTool() {
-    string Item_code;
+    string Item_ID;
+    int ItemID;
 
     displayBorrowRecords();
-    
+
     cin.ignore();
     do {
-        cout << "Enter Item code to return: ";
-        getline(cin, Item_code);
-        if (Item_code.empty()) {
-            cout << "Item code cannot be empty. Please try again." << endl;
+        cout << "Enter Item ID to return: ";
+        getline(cin, Item_ID);
+        if (Item_ID.empty()) {
+            cout << "Item ID cannot be empty. Please try again." << endl;
+            continue;
         }
-    } while (Item_code.empty());
-
+        ItemID = stoi(Item_ID);
+        if (ItemID < 1 || ItemID > borrowRecordCount) {
+            cout << "Task ID out of range!" << endl;
+            continue;
+        }
+        break;
+    } while (true);
+        
     bool found = false;
     for (int i = 0; i < borrowRecordCount; i++) {
-        if (borrowRecords[i][0] == Item_code) {
+        if (ItemID == i + 1) {
             found = true;
             if (borrowRecords[i][6] == "borrowed") {
                 borrowRecords[i][6] = "returned";
             }
 
-            if (inventoryManagement[i][4] == "InUse") {
-                inventoryManagement[i][4] = "Available";
+            for (int j = 0; j < inventoryCount; j++) {
+                if (inventoryManagement[j][0] == borrowRecords[i][0]) {
+                    if (inventoryManagement[j][4] == "InUse") {
+                        inventoryManagement[j][4] = "Available";
+                    }
+                    inventoryManagement[j][2] = to_string(stoi(inventoryManagement[j][2]) + stoi(borrowRecords[i][2]));
+                    break;
+                }
             }
-            
-            inventoryManagement[i][2] = to_string(stoi(inventoryManagement[i][2]) + stoi(borrowRecords[i][2]));
-
             cout << "Tool returned successfully!" << endl;
             break;
         }
@@ -456,7 +467,7 @@ void updateTaskStatus() {
 
     viewTasksByTechnician();
 
-    cin.ignore();
+    // cin.ignore();
     do {
         cout << "Enter task ID to update status: ";
         cin >> taskIdStr;
@@ -547,7 +558,7 @@ void technicianMenu() {
         cout << "\n=== Technician Menu ===\n";
         cout << "1. Task Operation\n";
         cout << "2. Tools Usage\n";
-        cout << "4. Exit\n";
+        cout << "3. Exit\n";
         cout << "Enter your choice: ";
         cin >> choice;
 
