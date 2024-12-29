@@ -349,7 +349,7 @@ void borrowTool() {
                 cout << "Enter duration in days (1/2): ";
                 getline(cin, borrowRecords[borrowRecordCount][4]);
                 if (borrowRecords[borrowRecordCount][4].empty() || !isNumeric(borrowRecords[borrowRecordCount][4])) {
-                    cout << "Duration must be a valid number greater than 0. Please try again." << endl;
+                    cout << "Duration must be a valid number. Please try again." << endl;
                 }
             } while (borrowRecords[borrowRecordCount][4].empty());
 
