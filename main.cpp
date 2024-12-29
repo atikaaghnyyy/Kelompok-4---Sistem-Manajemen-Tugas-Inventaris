@@ -126,16 +126,22 @@ void getDetailsTask() {
 }
 
 void taskManagementMenu() {
-    clearScreen();
+    string input;
     int choice;
+    
+    clearScreen();
     do {
         cout << "\n=== Task Management ===\n";
         cout << "1. Add a new task\n";
         cout << "2. View task list\n";
         cout << "3. Back\n";
         cout << "Enter your choice: ";
-        cin >> choice;
-
+        getline(cin, input);
+        if (!isNumeric(input)) {
+            cout << "Invalid input. Please enter a valid number.\n";
+            continue;
+        }
+        choice = stoi(input); 
         switch (choice) {
             case 1:
                 addNewTask();
@@ -254,8 +260,10 @@ void displayBorrowRecords() {
 }
 
 void inventoryManagementMenu() {
-    clearScreen();
+    string input;
     int choice;
+    
+    clearScreen();
     do {
         cout << "\n=== Inventory Management ===\n";
         cout << "1. Add a new inventory\n";
@@ -263,8 +271,12 @@ void inventoryManagementMenu() {
         cout << "3. View Borrow Records\n";
         cout << "4. Back\n";
         cout << "Enter your choice: ";
-        cin >> choice;
-
+        getline(cin, input);
+        if (!isNumeric(input)) {
+            cout << "Invalid input. Please enter a valid number.\n";
+            continue;
+        }
+        choice = stoi(input);  
         switch (choice) {
             case 1:
                 addNewInventory();
@@ -409,16 +421,22 @@ void returnTool() {
 }
 
 void toolsUsageMenu() {
-    clearScreen();
+    string input;
     int choice;
+    
+    clearScreen();
     do {
         cout << "\n=== Tools Usage ===\n";
         cout << "1. Borrow Tools\n";
         cout << "2. Return Tools\n";
         cout << "3. Back\n";
         cout << "Enter your choice: ";
-        cin >> choice;
-
+        getline(cin, input);
+        if (!isNumeric(input)) {
+            cout << "Invalid input. Please enter a valid number.\n";
+            continue;
+        }
+        choice = stoi(input);  
         switch (choice) {
             case 1:
                 borrowTool();
@@ -497,16 +515,22 @@ void updateTaskStatus() {
 }
 
 void taskOperationMenu() {
-    clearScreen();
+    string input;
     int choice;
+    
+    clearScreen();
     do {
         cout << "\n=== Task Operation ===\n";
         cout << "1. View Taks\n";
         cout << "2. Update Task Status \n";
         cout << "3. Back\n";
         cout << "Enter your choice: ";
-        cin >> choice;
-
+        getline(cin, input);
+        if (!isNumeric(input)) {
+            cout << "Invalid input. Please enter a valid number.\n";
+            continue;
+        }
+        choice = stoi(input);  
         switch (choice) {
             case 1:
                 viewTasksByTechnician();
@@ -525,7 +549,9 @@ void taskOperationMenu() {
 
 // =================== Main Menu ===================
 void adminMenu() {
+    string input;
     int choice;
+
     do {
         clearScreen();
         cout << "\n=== Admin Menu ===\n";
@@ -533,8 +559,12 @@ void adminMenu() {
         cout << "2. Inventory Management\n";
         cout << "3. Exit\n";
         cout << "Enter your choice: ";
-        cin >> choice;
-
+        getline(cin, input);
+        if (!isNumeric(input)) {
+            cout << "Invalid input. Please enter a valid number.\n";
+            continue;
+        }
+        choice = stoi(input);        
         switch (choice) {
             case 1:
                 taskManagementMenu();
@@ -552,6 +582,7 @@ void adminMenu() {
 }
 
 void technicianMenu() {
+    string input;
     int choice;
     do {
         clearScreen();
@@ -560,8 +591,12 @@ void technicianMenu() {
         cout << "2. Tools Usage\n";
         cout << "3. Exit\n";
         cout << "Enter your choice: ";
-        cin >> choice;
-
+        getline(cin, input);
+        if (!isNumeric(input)) {
+            cout << "Invalid input. Please enter a valid number.\n";
+            continue;
+        }
+        choice = stoi(input);
         switch (choice) {
             case 1:
                 taskOperationMenu();
@@ -580,7 +615,9 @@ void technicianMenu() {
 
 // =================== Main Program ===================
 int main() {
+    string input;
     int choice;
+
     do {
         clearScreen();
         cout << "\n=== Task and Inventory Management System ===\n";
@@ -588,8 +625,13 @@ int main() {
         cout << "2. Login as Technician\n";
         cout << "3. Exit\n";
         cout << "Enter your choice: ";
-        cin >> choice;
+        getline(cin, input);
 
+        if (!isNumeric(input)) {
+            cout << "Invalid input. Please enter a valid number.\n";
+            continue;
+        }
+        choice = stoi(input);
         switch (choice) {
             case 1:
                 adminMenu();
