@@ -375,7 +375,7 @@ void returnTool() {
         }
         ItemID = stoi(Item_ID);
         if (ItemID < 1 || ItemID > borrowRecordCount) {
-            cout << "Task ID out of range!" << endl;
+            cout << "Item ID not found" << endl;
             continue;
         }
         break;
@@ -452,7 +452,7 @@ void viewTasksByTechnician() {
     for (int i = 0; i < taskCount; i++) {
         if (taskManagement[i][5] == technicianName) {
             found = true;
-            cout << "Task ID: " << i + 1 << ", Title: " << taskManagement[i][0] << ", Description: " << taskManagement[i][1] << ", Deadline: " << taskManagement[i][2] << ", Priority: " << taskManagement[i][3] << ", Status: " << taskManagement[i][4] << endl;
+            cout << "Task ID: " << i + 1 << ", Title: " << taskManagement[i][0] << ", Description: " << taskManagement[i][1] << ", Deadline: " << taskManagement[i][2] << ", Priority: " << taskManagement[i][3] << ", Status: " << taskManagement[i][4] << ", Technician: " << taskManagement[i][5] << endl;
         }
     }
 
@@ -477,7 +477,7 @@ void updateTaskStatus() {
         }
         taskId = stoi(taskIdStr);
         if (taskId < 1 || taskId > taskCount) {
-            cout << "Task ID out of range!" << endl;
+            cout << "Task ID not found" << endl;
             continue;
         }
         break;
